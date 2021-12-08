@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ClassUtils;
 
+// Redisson的设置在这里，而redis的设置在application-dev.yml设置
+
 @Configuration
 public class RedissonConfig {
 
@@ -22,7 +24,7 @@ public class RedissonConfig {
     private int retryInterval = 1500;
     private int reconnectionTimeout = 3000;
     private int failedAttempts = 3;
-    private String password = null;
+    private String password = "123456";
     private int subscriptionsPerConnection = 5;
     private String clientName = null;
     private int subscriptionConnectionMinimumIdleSize = 1;
