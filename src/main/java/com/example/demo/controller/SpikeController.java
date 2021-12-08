@@ -5,7 +5,9 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.SessionCallback;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,7 +48,17 @@ public class SpikeController {
         // 初始化商品数量和售卖数量
         stringRedisTemplate.opsForValue().set("product_sku", "5");
         successNum.set(0);
-        return "初始化库存成功";
+        Integer sku = Integer.parseInt(stringRedisTemplate.opsForValue().get("product_sku"));
+        log.info("初始化库存数量：" + sku);
+        return "初始化库存数量：" + sku;
+    }
+
+    @RequestMapping(value = "/successNum", method = RequestMethod.GET)
+    public String successNum() {
+        Integer sku = Integer.parseInt(stringRedisTemplate.opsForValue().get("product_sku"));
+        log.info("顾客成功抢到的商品数量：" + successNum.get());
+        log.info("库存数量：" + sku);
+        return "顾客成功抢到的商品数量：" + successNum.get() + "</br>库存数量：" + sku;
     }
 
     /**
@@ -161,8 +173,4 @@ public class SpikeController {
 
     }
 
-    @RequestMapping(value = "/successNum", method = RequestMethod.GET)
-    public String successNum() {
-        return "顾客成功抢到的商品数量：" + successNum.get();
-    }
 }
