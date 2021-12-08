@@ -24,6 +24,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class SpikeController {
 
+    /**
+     *  StringRedisTemplate和RedisTemplate的区别和选择
+     *  https://blog.csdn.net/qq_39992641/article/details/97787443
+     * 当你的redis数据库里面本来存的是字符串数据或者你要存取的数据就是字符串类型数据的时候，那么你就使用StringRedisTemplate即可，
+     * 但是如果你的数据是复杂的对象类型，而取出的时候又不想做任何的数据转换，直接从Redis里面取出一个对象，那么使用RedisTemplate是更好的选择。
+     * 就像get/post请求的区别一样，各有各的应用场景
+     */
+
+
     @Resource(name = "stringRedisTemplate")
     private StringRedisTemplate stringRedisTemplate;
 
@@ -34,6 +43,7 @@ public class SpikeController {
 
     @RequestMapping(value = "/initSku", method = RequestMethod.GET)
     public String initSku() {
+        // 初始化商品数量和售卖数量
         stringRedisTemplate.opsForValue().set("product_sku", "5");
         successNum.set(0);
         return "初始化库存成功";
@@ -128,6 +138,7 @@ public class SpikeController {
         }
     }
 
+    // 通过加锁方式解决超卖问题(redisson)
     @RequestMapping(value = "/reduceSku4", method = RequestMethod.GET)
     public String reduceSku4() {
         RLock rLock = redissonClient.getLock("product_sku");
@@ -142,6 +153,7 @@ public class SpikeController {
 
             stringRedisTemplate.opsForValue().set("product_sku", sku.toString());
 
+            log.info("减少库存成功,共减少" + successNum.incrementAndGet());
             return "减少库存成功,共减少" + successNum.incrementAndGet();
         } finally {
             rLock.unlock();

@@ -21,11 +21,11 @@ public class DemoApplication implements CommandLineRunner {
 	public void run(String... strings) throws Exception {
 		log.info("Application is success, Index >> http://127.0.0.1:{}", serverPort);
 		log.info("API{初始化库存数量} >> http://127.0.0.1:{}/api/spike/initSku", serverPort);
-		log.info("API{减少库存数量} >> http://127.0.0.1:{}/api/spike/reduceSku", serverPort);
-		log.info("API{减少库存数量(加事务)} >> http://127.0.0.1:{}/api/spike/reduceSku2", serverPort);
+		log.info("API{减少库存数量(会超卖)} >> http://127.0.0.1:{}/api/spike/reduceSku", serverPort);
+//		log.info("API{减少库存数量(加事务)} >> http://127.0.0.1:{}/api/spike/reduceSku2", serverPort);
+		log.info("API{减少库存数量(redisson锁)} >> http://127.0.0.1:{}/api/spike/reduceSku4", serverPort);
 		log.info("API{查看共减少库存数量} >> http://127.0.0.1:{}/api/spike/successNum", serverPort);
-
-		log.info("API{查看共减少库存数量} >> http://127.0.0.1:{}/api/set/successNum", serverPort);
-		log.info("API{减少库存数量} >> http://127.0.0.1:{}/api/set/reduceSku", serverPort);
+//		log.info("API{查看共减少库存数量} >> http://127.0.0.1:{}/api/set/successNum", serverPort);
+//		log.info("API{减少库存数量} >> http://127.0.0.1:{}/api/set/reduceSku", serverPort);
 	}
 }

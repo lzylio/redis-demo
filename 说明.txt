@@ -1,0 +1,13 @@
+一、技术方案
+1.redisson 所有指令都通过lua脚本原子性执行
+
+二、接口说明
+// 初始化商品数量和售卖数量
+http://127.0.0.1:8090/api/spike/initSku
+
+// 秒杀商品 带redisson锁
+http://127.0.0.1:8090/api/spike/reduceSku4
+
+// 成功售卖商品数量
+http://127.0.0.1:8090/api/spike/successNum
+

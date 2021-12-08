@@ -10,11 +10,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ClassUtils;
 
 // Redisson的设置在这里，而redis的设置在application-dev.yml设置
+// 注意路径和端口、注意密码
 
 @Configuration
 public class RedissonConfig {
 
-    private String address = "redis://localhost:6379";
+    private String address = "redis://localhost:6379";// 注意路径和端口
     private int connectionMinimumIdleSize = 10;
     private int idleConnectionTimeout = 10000;
     private int pingTimeout = 1000;
@@ -24,7 +25,7 @@ public class RedissonConfig {
     private int retryInterval = 1500;
     private int reconnectionTimeout = 3000;
     private int failedAttempts = 3;
-    private String password = "123456";
+    private String password = "123456";// 注意密码
     private int subscriptionsPerConnection = 5;
     private String clientName = null;
     private int subscriptionConnectionMinimumIdleSize = 1;
