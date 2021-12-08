@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -16,6 +17,8 @@ import redis.clients.jedis.Transaction;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -42,6 +45,8 @@ public class SpikeController {
     private RedissonClient redissonClient;
 
     private AtomicInteger successNum = new AtomicInteger(0);
+
+    private static final String LOCK_CAUTO = "cauto";
 
     @RequestMapping(value = "/initSku", method = RequestMethod.GET)
     public String initSku() {
@@ -83,11 +88,15 @@ public class SpikeController {
     }
 
     // 通过加锁方式解决超卖问题(redisson)
+    @SneakyThrows
     @RequestMapping(value = "/reduceSku4", method = RequestMethod.GET)
     public String reduceSku4() {
-        RLock rLock = redissonClient.getLock("product_sku");
+        RLock rLock = redissonClient.getLock(LOCK_CAUTO);
         try {
-            rLock.lock();
+            rLock.lock(50,TimeUnit.SECONDS);// 锁的有效时间，默认为30，这里设置为50方便观察-不确定有没有看门狗
+//            rLock.lock();// 默认30秒，有看门狗，自动续期，生产一般使用这个
+
+            TimeUnit.SECONDS.sleep(10);// 加长获取锁时间，方便观察
 
             Integer sku = Integer.parseInt(stringRedisTemplate.opsForValue().get("product_sku"));
             sku = sku - 1;
