@@ -166,7 +166,8 @@ public class SpikeController {
             stringRedisTemplate.opsForValue().set("product_sku", sku.toString());
 
             log.info("减少库存成功,共减少" + successNum.incrementAndGet());
-            return "减少库存成功,共减少" + successNum.incrementAndGet();
+
+            return "调用成功";
         } finally {
             rLock.unlock();
         }
