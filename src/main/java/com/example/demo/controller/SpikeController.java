@@ -71,12 +71,40 @@ public class SpikeController {
         Integer sku = Integer.parseInt(stringRedisTemplate.opsForValue().get("product_sku"));
         sku = sku - 1;
         if (sku < 0) {
+            log.info("当前线程:" + Thread.currentThread().getName() + ";库存不足");
             return "库存不足";
         }
 
         stringRedisTemplate.opsForValue().set("product_sku", sku.toString());
 
-        return "减少库存成功,共减少" + successNum.incrementAndGet();
+        log.info("当前线程：" + Thread.currentThread().getName() + ";减少库存成功,共减少" + successNum.incrementAndGet());
+
+        return "调用成功";
+    }
+
+    // 通过加锁方式解决超卖问题(redisson)
+    @RequestMapping(value = "/reduceSku4", method = RequestMethod.GET)
+    public String reduceSku4() {
+        RLock rLock = redissonClient.getLock("product_sku");
+        try {
+            rLock.lock();
+
+            Integer sku = Integer.parseInt(stringRedisTemplate.opsForValue().get("product_sku"));
+            sku = sku - 1;
+            if (sku < 0) {
+                log.info("当前线程:" + Thread.currentThread().getName() + ";库存不足");
+                return "库存不足";
+            }
+
+            stringRedisTemplate.opsForValue().set("product_sku", sku.toString());
+
+            log.info("当前线程：" + Thread.currentThread().getName() + ";减少库存成功,共减少" + successNum.incrementAndGet());
+
+            return "调用成功";
+        } finally {
+            rLock.unlock();
+        }
+
     }
 
 
@@ -148,30 +176,6 @@ public class SpikeController {
             transaction.discard();
             return "fail";
         }
-    }
-
-    // 通过加锁方式解决超卖问题(redisson)
-    @RequestMapping(value = "/reduceSku4", method = RequestMethod.GET)
-    public String reduceSku4() {
-        RLock rLock = redissonClient.getLock("product_sku");
-        try {
-            rLock.lock();
-
-            Integer sku = Integer.parseInt(stringRedisTemplate.opsForValue().get("product_sku"));
-            sku = sku - 1;
-            if (sku < 0) {
-                return "库存不足";
-            }
-
-            stringRedisTemplate.opsForValue().set("product_sku", sku.toString());
-
-            log.info("减少库存成功,共减少" + successNum.incrementAndGet());
-
-            return "调用成功";
-        } finally {
-            rLock.unlock();
-        }
-
     }
 
 }

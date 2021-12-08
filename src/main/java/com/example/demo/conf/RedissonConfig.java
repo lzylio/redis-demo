@@ -16,6 +16,7 @@ import org.springframework.util.ClassUtils;
 public class RedissonConfig {
 
     private String address = "redis://localhost:6379";// 注意路径和端口
+    private String password = "123456";// 注意密码
     private int connectionMinimumIdleSize = 10;
     private int idleConnectionTimeout = 10000;
     private int pingTimeout = 1000;
@@ -25,7 +26,6 @@ public class RedissonConfig {
     private int retryInterval = 1500;
     private int reconnectionTimeout = 3000;
     private int failedAttempts = 3;
-    private String password = "123456";// 注意密码
     private int subscriptionsPerConnection = 5;
     private String clientName = null;
     private int subscriptionConnectionMinimumIdleSize = 1;
@@ -42,7 +42,9 @@ public class RedissonConfig {
     @Bean(destroyMethod = "shutdown")
     RedissonClient redisson() throws Exception {
         Config config = new Config();
-        config.useSingleServer().setAddress(address)
+        config.useSingleServer()
+                .setAddress(address)
+                .setPassword(password)
                 .setConnectionMinimumIdleSize(connectionMinimumIdleSize)
                 .setConnectionPoolSize(connectionPoolSize)
                 .setDatabase(database)
@@ -59,8 +61,7 @@ public class RedissonConfig {
                 .setTimeout(timeout)
                 .setConnectTimeout(connectTimeout)
                 .setIdleConnectionTimeout(idleConnectionTimeout)
-                .setPingTimeout(pingTimeout)
-                .setPassword(password);
+                .setPingTimeout(pingTimeout);
         Codec codec = (Codec) ClassUtils.forName("org.redisson.codec.JsonJacksonCodec", ClassUtils.getDefaultClassLoader()).newInstance();
         config.setCodec(codec);
         config.setThreads(thread);
