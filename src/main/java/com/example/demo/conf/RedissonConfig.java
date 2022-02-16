@@ -31,7 +31,7 @@ public class RedissonConfig {
     private int subscriptionConnectionMinimumIdleSize = 1;
     private int subscriptionConnectionPoolSize = 50;
     private int connectionPoolSize = 64;
-    private int database = 1; // 注意是1号库
+    private int database = 0; // 注意是0号库
     private boolean dnsMonitoring = false;
     private int dnsMonitoringInterval = 5000;
 

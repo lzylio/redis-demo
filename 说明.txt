@@ -1,3 +1,7 @@
+【说明】
+参考git：https://github.com/14251104246/redis-demo
+Redisson的设置在RedissonConfig，而redis的设置在application-dev.yml设置
+
 一、技术方案
 1.redisson 所有指令都通过lua脚本原子性执行
 2.锁定不同的商品使用不用的key常量
@@ -11,4 +15,8 @@ http://127.0.0.1:8090/api/spike/reduceSku4
 
 // 成功售卖商品数量
 http://127.0.0.1:8090/api/spike/successNum
+
+【Redisson的原理】
+1.rLock.lock() 加锁通过lua脚本写入redis
+2.rLock.unlock() 释放锁 删除key
 

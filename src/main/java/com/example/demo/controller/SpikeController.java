@@ -93,6 +93,7 @@ public class SpikeController {
     public String reduceSku4() {
         RLock rLock = redissonClient.getLock(LOCK_CAUTO);
         try {
+            // 加锁
             rLock.lock(50,TimeUnit.SECONDS);// 锁的有效时间，默认为30，这里设置为50方便观察-不确定有没有看门狗
 //            rLock.lock();// 默认30秒，有看门狗，自动续期，生产一般使用这个
 
@@ -111,6 +112,7 @@ public class SpikeController {
 
             return "调用成功";
         } finally {
+            // 释放锁
             rLock.unlock();
         }
 
