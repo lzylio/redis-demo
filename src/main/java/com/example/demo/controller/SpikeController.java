@@ -17,7 +17,6 @@ import redis.clients.jedis.Transaction;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -94,10 +93,20 @@ public class SpikeController {
         RLock rLock = redissonClient.getLock(LOCK_CAUTO);
         try {
             // 加锁
-            rLock.lock(50,TimeUnit.SECONDS);// 锁的有效时间，默认为30，这里设置为50方便观察-不确定有没有看门狗
+            log.info("当前线程：" + Thread.currentThread().getName() + ";======等待锁======");
+
+//            rLock.lock(50, TimeUnit.SECONDS);// 锁的有效时间，默认为30，这里设置为50方便观察-不确定有没有看门狗
+            rLock.lock(60, TimeUnit.SECONDS);// 正常锁
+            /*测试可重复锁 获取锁 start*/
+            rLock.lock(60, TimeUnit.SECONDS);// 重入锁2 value + 1
+            rLock.lock(60, TimeUnit.SECONDS);// 重入锁3 value + 1
+            /*测试可重复锁 获取锁 end*/
+
 //            rLock.lock();// 默认30秒，有看门狗，自动续期，生产一般使用这个
 
-            TimeUnit.SECONDS.sleep(10);// 加长获取锁时间，方便观察
+            log.info("当前线程：" + Thread.currentThread().getName() + ";======获取锁======");
+
+            TimeUnit.SECONDS.sleep(5);// 加长获取锁时间，方便观察
 
             Integer sku = Integer.parseInt(stringRedisTemplate.opsForValue().get("product_sku"));
             sku = sku - 1;
@@ -105,15 +114,22 @@ public class SpikeController {
                 log.info("当前线程:" + Thread.currentThread().getName() + ";库存不足");
                 return "库存不足";
             }
-
             stringRedisTemplate.opsForValue().set("product_sku", sku.toString());
-
             log.info("当前线程：" + Thread.currentThread().getName() + ";减少库存成功,共减少" + successNum.incrementAndGet());
-
             return "调用成功";
         } finally {
-            // 释放锁
-            rLock.unlock();
+            rLock.unlock();// 正常释放锁
+            log.info("当前线程：" + Thread.currentThread().getName() + ";======释放锁======");
+
+            /*测试可重复锁 释放锁 start*/
+//            TimeUnit.SECONDS.sleep(2);
+//            rLock.unlock();// 释放重入锁2 value - 1
+//            log.info("当前线程：" + Thread.currentThread().getName() + ";======释放锁======");
+//
+//            TimeUnit.SECONDS.sleep(2);
+//            rLock.unlock();// 释放重入锁3 value - 1
+//            log.info("当前线程：" + Thread.currentThread().getName() + ";======释放锁======");
+            /*测试可重复锁 释放锁 end*/
         }
 
     }

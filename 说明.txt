@@ -6,7 +6,7 @@ Redisson的设置在RedissonConfig，而redis的设置在application-dev.yml设�
 1.redisson 所有指令都通过lua脚本原子性执行
 2.锁定不同的商品使用不用的key常量
 
-二、接口说明
+二、接口说明（API）
 // 初始化商品数量和售卖数量
 http://127.0.0.1:8090/api/spike/initSku
 
@@ -16,7 +16,9 @@ http://127.0.0.1:8090/api/spike/reduceSku4
 // 成功售卖商品数量
 http://127.0.0.1:8090/api/spike/successNum
 
-【Redisson的原理】
+【Redisson实现Redis分布式锁的原理】
+详细 https://www.cnblogs.com/AnXinliang/p/10019389.html
 1.rLock.lock() 加锁通过lua脚本写入redis
-2.rLock.unlock() 释放锁 删除key
+2.可重入锁每次加锁 value + 1；释放锁每次 value - 1，如果发现是0，则删除key（真正释放锁）
+3.可重入锁 加锁N次，需要解锁N次，否则后者获取不了锁
 
